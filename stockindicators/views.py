@@ -22,6 +22,7 @@ def index(request):
                 result_date = date_obj - timedelta(days=100)
 
                 df2 = yf.download(f"{form.data['nome']}.sa",start=f"{result_date.strftime('%Y-%m-%d')}",end=f"{form.data['data_final']}", progress=False)
+                
                 data = []
                 data = RSI(data=df2,column='Close', window=14)
 
@@ -36,18 +37,25 @@ def index(request):
                 data['Date'] = data['Date'].dt.strftime('%d-%m-%Y')
                 data = data.to_dict(orient='records')
 
+                context = {
+                    'sigla':form.data['nome'],
+                    'form':StockRangeForm,
+                    'companies':data,
+                    'vol':vol,
+                    'avg_return':avg_return,
+                    'var':var
+                }
+
             except Exception as e:
                 print(f"Erro: {e}")
+                context = {
+                    'companies':[],
+                    'erro':'Ocorreu um erro na obtenção dos indicadores da empresa ou a sigla da empresa está incorreta!',
+                    'form':StockRangeForm,
+                }
 
-            context = {
-            'form':StockRangeForm,
-            'companies':data,
-            'vol':vol,
-            'avg_return':avg_return,
-            'var':var
-            }
-
-            return render(request, 'index.html',context=context)
+            finally:
+                return render(request, 'index.html',context=context)
     
     context = {
         'form':StockRangeForm

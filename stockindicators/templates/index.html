@@ -120,14 +120,14 @@
           {% empty %}
           <tr>
             <td colspan="4" class="text-center">
-              Não Há empresas para serem listadas
+              {% if erro %} {{erro}} {% endif %}
             </td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
-    {% endif %} {% block custom_js %}
+    {% endif %} {% if erro %} {{erro}} {% endif %} {% block custom_js %}
     <script>
       if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href);
