@@ -17,44 +17,117 @@
     <div id="content" class="container my-3 mt-3">
       <div class="row justify-content-center">
         <div class="card" style="width: 100%">
-          <div class="row justify-content-center">
-            Busca de ações e seus indicadores fundamentalistas
-          </div>
+          <div class="row justify-content-center">Indicadores de uma ação</div>
           <div class="card-body">
-            <form method="post" autocomplete="off">
-              {% csrf_token %} {% for field in form %}
-              <div class="form-group row">
-                <label
-                  for="{{ field.id_for_label }}"
-                  class="col-sm-2 col-form-label"
-                  >{{ field.label }}</label
-                >
-                <div class="col-sm-10">{{ field }}</div>
+            <div class="row">
+              <div class="col-6">
+                <form method="post" autocomplete="off">
+                  {% csrf_token %} {% for field in form %}
+                  <div class="form-group row">
+                    <label
+                      for="{{ field.id_for_label }}"
+                      class="col-sm-2 col-form-label"
+                      >{{ field.label }}</label
+                    >
+                    <div class="col-sm-10">{{ field }}</div>
+                  </div>
+                  {% if field.errors %} {% for error in field.errors %}
+                  <div class="offset-sm-2 col-sm-10">
+                    <span class="badge badge-pill badge-danger"
+                      >{{ error }}</span
+                    >
+                  </div>
+                  {% endfor %} {% endif %} {% endfor %}
+                  <div class="row justify-content-end">
+                    <div class="col">
+                      <button
+                        class="btn btn-primary btn-block"
+                        type="submit"
+                        name="acao"
+                        value="buscar"
+                      >
+                        Buscar
+                      </button>
+                    </div>
+                  </div>
+                </form>
               </div>
-              {% if field.errors %} {% for error in field.errors %}
-              <div class="offset-sm-2 col-sm-10">
-                <span class="badge badge-pill badge-danger">{{ error }}</span>
-              </div>
-              {% endfor %} {% endif %} {% endfor %}
-              <div class="row justify-content-end">
-                <div class="col">
-                  <button
-                    class="btn btn-primary btn-block"
-                    type="submit"
-                    name="acao"
-                    value="buscar"
+              <div class="col-6">
+                {% if vol %}
+
+                <div class="table-responsive my-2 mt-2 mr-1">
+                  <table
+                    class="table table-striped table-bordered border rounded"
                   >
-                    Buscar
-                  </button>
+                    <thead>
+                      <tr>
+                        <th class="col-1">Retorno médio</th>
+                        <th class="col-1">Volatilidade</th>
+                        <th class="col-1">Var (Value-at-Risk)</th>
+                      </tr>
+                    </thead>
+                    <tr class="bg-white">
+                      <td class="col-1">{{ avg_return }}</td>
+                      <td class="col-1">{{ vol }}</td>
+                      <td class="col-1">{{ var }}</td>
+                    </tr>
+                  </table>
                 </div>
+
+                {% endif %}
               </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    {% block custom_js %}
+    {% if companies|length > 0 %}
+    <div class="table-responsive my-2 mt-2 mr-1">
+      <table class="table table-striped table-bordered border rounded">
+        <thead>
+          <tr>
+            <th class="col-1">Date</th>
+            <th class="col-1">Open</th>
+            <th class="col-1">High</th>
+            <th class="col-1">Low</th>
+            <th class="col-1">Close</th>
+            <th class="col-1">RSI</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <div
+      class="table-responsive my-2 mt-2"
+      style="
+        height: calc(100vh - 400px);
+        scrollbar-width: none;
+        overflow-y: scroll;
+      "
+    >
+      <table class="table table-striped table-bordered border rounded">
+        <tbody>
+          {% for company in companies %}
+          <tr class="bg-white">
+            <td class="col-1">{{ company.Date }}</td>
+            <td class="col-1">{{ company.Open }}</td>
+            <td class="col-1">{{ company.High }}</td>
+            <td class="col-1">{{ company.Low}}</td>
+            <td class="col-1">{{ company.Close }}</td>
+            <td class="col-1">{{ company.rsi }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="text-center">
+              Não Há empresas para serem listadas
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %} {% block custom_js %}
     <script>
       if (window.history.replaceState) {
         window.history.replaceState(null, null, window.location.href);
