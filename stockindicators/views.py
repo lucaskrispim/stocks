@@ -17,12 +17,18 @@ def index(request):
         if form.is_valid():
 
             try:
+
+                if ( form.data['data_inicial'] > form.data['data_final'] ): 
+                    raise Exception("A data inicial deve ser anterior a data final!")
+
                 date_obj = datetime.strptime(form.data['data_inicial'], '%Y-%m-%d')
 
                 result_date = date_obj - timedelta(days=100)
 
                 df2 = yf.download(f"{form.data['nome']}.sa",start=f"{result_date.strftime('%Y-%m-%d')}",end=f"{form.data['data_final']}", progress=False)
                 
+                if len(df2) ==0:  raise Exception("Empresa não encontrada ou falha no download dos dados!")
+
                 data = []
                 data = RSI(data=df2,column='Close', window=14)
 
@@ -38,7 +44,7 @@ def index(request):
                 data = data.to_dict(orient='records')
 
                 context = {
-                    'sigla':form.data['nome'],
+                    'sigla':form.data['nome'].upper(),
                     'form':StockRangeForm,
                     'companies':data,
                     'vol':vol,
@@ -49,8 +55,9 @@ def index(request):
             except Exception as e:
                 print(f"Erro: {e}")
                 context = {
+                    'sigla':form.data['nome'].upper(),
                     'companies':[],
-                    'erro':'Ocorreu um erro na obtenção dos indicadores da empresa ou a sigla da empresa está incorreta!',
+                    'erro':e,
                     'form':StockRangeForm,
                 }
 
