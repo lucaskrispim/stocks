@@ -59,6 +59,7 @@
 
                 <div class="table-responsive my-2 mt-2 mr-1">
                   <table
+                    id="vol_table"
                     class="table table-striped table-bordered border rounded"
                   >
                     <thead>
@@ -68,7 +69,7 @@
                         <th class="col-1">Var (Value-at-Risk)</th>
                       </tr>
                     </thead>
-                    <tr class="bg-white">
+                    <tr id="vol_tr" class="bg-white">
                       <td class="col-1">{{ avg_return }}</td>
                       <td class="col-1">{{ vol }}</td>
                       <td class="col-1">{{ var }}</td>
@@ -110,7 +111,26 @@
     >
       <table class="table table-striped table-bordered border rounded">
         <tbody>
-          {% for company in companies %}
+          {% for company in companies %} {%if company.rsi > 70 %}
+          <tr class="bg-primary">
+            <td class="col-1">{{ company.Date }}</td>
+            <td class="col-1">{{ company.Open }}</td>
+            <td class="col-1">{{ company.High }}</td>
+            <td class="col-1">{{ company.Low}}</td>
+            <td class="col-1">{{ company.Close }}</td>
+            <td class="col-1">{{ company.rsi }}</td>
+          </tr>
+          {% else%} {% if company.rsi < 30 %}
+
+          <tr class="bg-danger">
+            <td class="col-1">{{ company.Date }}</td>
+            <td class="col-1">{{ company.Open }}</td>
+            <td class="col-1">{{ company.High }}</td>
+            <td class="col-1">{{ company.Low}}</td>
+            <td class="col-1">{{ company.Close }}</td>
+            <td class="col-1">{{ company.rsi }}</td>
+          </tr>
+          {% else%}
           <tr class="bg-white">
             <td class="col-1">{{ company.Date }}</td>
             <td class="col-1">{{ company.Open }}</td>
@@ -119,13 +139,7 @@
             <td class="col-1">{{ company.Close }}</td>
             <td class="col-1">{{ company.rsi }}</td>
           </tr>
-          {% empty %}
-          <tr>
-            <td colspan="4" class="text-center">
-              {% if erro %} {{erro}} {% endif %}
-            </td>
-          </tr>
-          {% endfor %}
+          {% endif %} {% endif %} {% endfor %}
         </tbody>
       </table>
     </div>
